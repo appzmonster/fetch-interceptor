@@ -1,0 +1,46 @@
+{
+  "name": "@appzmonster/fetch-interceptor",
+  "version": "1.0.0",
+  "description": "Fetch-interceptor is a JavaScript library to enable request interceptor feature on Fetch API. The library extends Fetch API and make use of fluent API design principle to chain one or multiple request interceptors to a Fetch API request.",
+  "main": "./index.js",
+  "scripts": {
+    "prebuild": "rm -rf dist && mkdir dist && cp ./package.json dist && cp ./README.md dist && cp ./LICENSE dist && cp ./CHANGELOG.md dist",
+    "build": "npm run prebuild && babel ./src -d dist --copy-files",
+    "publish:npm": "cd dist && npm publish --access public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/appzmonster/fetch-interceptor.git"
+  },
+  "keywords": [
+    "fetch",
+    "fetch api",
+    "api",
+    "js",
+    "javascript",
+    "xhr",
+    "intercept",
+    "interceptor",
+    "request",
+    "fluent",
+    "mock",
+    "delegating handler",
+    "outgoing request"
+  ],
+  "author": "Jimmy Leong (Github: appzmonster)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/appzmonster/fetch-interceptor/issues"
+  },
+  "homepage": "https://github.com/appzmonster/fetch-interceptor#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.14.5",
+    "@babel/core": "^7.14.6",
+    "@babel/preset-env": "^7.14.7"
+  },
+  "babel": {
+    "presets": [
+      "@babel/preset-env"
+    ]
+  }
+}
