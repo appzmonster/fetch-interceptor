@@ -1,6 +1,6 @@
 # Fetch-interceptor
 
-Fetch-interceptor is a JavaScript library to enable request interceptor feature on [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API). The library extends Fetch API and make use of [fluent API](https://en.wikipedia.org/wiki/Fluent_interface) design principle to chain one or multiple request interceptors to a Fetch API request.
+Fetch-interceptor is a JavaScript library to enable request interceptor feature on [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API). The library extends Fetch API and uses [fluent API](https://en.wikipedia.org/wiki/Fluent_interface) design to allow chaining of one or multiple request interceptors to a Fetch API request.
 
 Example syntax:
 ```
@@ -18,14 +18,14 @@ fetch
 
 ### What is "Request interceptor"?
 ---
-Request interceptor is a function that gets activated (invoked) on an outgoing request (in-flight). When a request interceptor is activated, it can perform additional processing on the outgoing request such as adding or changing request header. Also, when the request returns, the same request interceptor receives the response from the request and can perform additional processing on the response before returning the response to the caller. For example, a request interceptor can transform a xml response to json response and return the json response to the caller.
+Request interceptor is a function that is invoked during an in-flight (outgoig) request and is designed to intercept a request to perform additional processing before the request is sent and after the request returns. A request interceptor can add or modify a request header before the request is sent or transform a request response from xml to json. One or multiple request interceptors can also be chained together to work on a request. This is very useful in use case where you need to perform certain action and pass the result of the action to the next interceptor in a request.
 
-In summary, a request interceptor enables the ability to "intercept" and "process" the request and response of a browser request.
+In short, a request interceptor enables the application to do additional action (intercept) before and after a request.
 
 
 ## Prerequisites
 ---
-The library extends [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) and expects the browser supports Fetch API. The library does not include polyfill to enable Fetch API. Necessary Fetch API polyfill must be implemented for browser that does not support Fetch API before using this library.
+The library extends [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) and expects the browser supports Fetch API. The library does not include polyfill to enable Fetch API. You are responsible to include any polyfill for browser that doesn't support Fetch API by default.
 
 
 ## Installation
@@ -46,14 +46,14 @@ import { initialize } from '@appzmonster/fetch-interceptor';
 initialize();
 ```
 
-Typically, you'll code the above in `./index.js` or any JavaScript file that you use as the entry point to your application. Also, take note that you just need to invoke `initialize()` function once per application lifecycle. The `initialize()` function will checks the existence of `'fetch'` in `window` object and do necessary extension.
+Typically, you'll code the above in `./index.js` or any JavaScript file that you use as the entry point to your application. Also, take note that you just need to invoke `initialize()` function once per application lifecycle. The `initialize()` function will check if `'fetch'` exist in the `window` object and do necessary extension.
 
->NOTE: Invoking `initialize()` multiple times does not throw error or having any undesired side effect.
+>NOTE: Invoking `initialize()` multiple times does not throw error or produce any undesirable side effect.
 
 
-### Invoke fetch with request interceptor
+### Enable Request Interceptor in a Fetch Request
 ---
-In order to use request interceptor in a fetch request, you have to add the desired request interceptor to the request.
+In order to use request interceptor in a fetch request, you have to add the request interceptor to the fetch request via the `with` function: 
 
 Using async / await:
 ```
@@ -67,13 +67,13 @@ fetch.with(/*request interceptor here*/)("https://some-api.somedomain.com", { me
 
 You can add one or multiple request interceptors to a request. **When multiple request interceptors are added (chained together)**, these request interceptors get invoked in a **specific order**:
 
-> ***When a request is outgoing***, each request interceptor added to the fetch request is activated in the **same order** of how they are added. Each request interceptor is provided with both the `resource` and `init` (refer to arguments of [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch)), basically the fetch request arguments. The request interceptor can manipulate these arguments and pass them to the next request interceptor in line. This continues until the last request interceptor in line sends out the request to the designated service API. The request is sent out using the manipulated `resource` and `init` arguments (not the original version). For example, if you chained 2 request interceptors **A** and **B** with **A** interceptor adds a "X-SomeName" header to the request, when **B** interceptor is invoked, it has the "X-SomeName" header added by **A** interceptor.
+> ***When a request is outgoing***, the first added request interceptor gets to execute first follows by the second added interceptor so on so forth until the last added interceptor. Every request interceptor is passed both the `resource` and `init` arguments of the [Fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch) request. The request interceptor can manipulate these arguments and continue passing the arguments to the next request interceptor until the last interceptor. Finally, the request sends out using the manipulated arguments to the designated service API (`resource`). For example, if you chained 2 request interceptors **A** and **B** with **A** interceptor adds a "`X-DataExpiry`" header to the request, when **B** interceptor is invoked, it has the "`X-DataExpiry`" header from **A** interceptor. **B** interceptor can modify the header and do any other processing to the request arguments.
 
-> ***When a request returns to the caller with response***, the added request interceptors are invoked in the **reverse order** of how they are added. Using the same example above (**A** and **B**), **B** interceptor is invoked first follows by **A** interceptor. For example, if **B** interceptor modifies the response, when **A** interceptor is invoked, it receives the modified response from **B** instead of the original response from the service API.
+> ***When a request returns***, the request interceptors are invoked in the **reverse order** of how they are added. Using the same example above (**A** and **B**), **B** interceptor gets invoked first follows by **A** interceptor. In this case, if **B** interceptor modifies the response, when **A** interceptor is invoked, it receives the modified response from **B** instead of the original response from the service API.
 
-Chaining multiple request interceptors creates a very powerful fetch request to solve complex use case. For example, in a typical [OAuth 2.0](https://oauth.net/2/pkce/) and [Microservice](https://microservices.io/) use case, very often you need to send a request with a valid bearer token which you exchange with an authorization server. With a microservice architecture, you also need to track or correlate all activities across multiple services from frontend to backend. Such use case is a very good fit to use request interceptor - add 2 request interceptors, one to handle bearer token exchange and header injection and another to create a correlation context.
+Chaining multiple request interceptors creates a very powerful fetch request. For example, in a typical [OAuth 2.0](https://oauth.net/2/pkce/) and [Microservice](https://microservices.io/) use case, very often you need to send a request with a bearer token which you exchange with an authorization server right before you initiate the request. With a microservice architecture, you also need to track or correlate all activities across multiple services from frontend to backend. Such use case is a good fit to use or chain multiple request interceptors - add 2 request interceptors, one to handle bearer token exchange plus header injection and another interceptor to create a correlation context that gets sent from frontend to all backend microservices.
 
-The following is an example how you can add 3 request interceptors **A**, **B**, **C** to a fetch request:
+The following is an example how you can add / chain 3 request interceptors **A**, **B**, **C** to a fetch request:
 
 ```
 let response = await fetch
@@ -84,13 +84,13 @@ let response = await fetch
 ```
 > NOTE: Request interceptor must be an instance of `BaseInterceptor` class. We'll talk more about `BaseInterceptor` when we cover the topic of "**Developing your own request interceptor**" below.
 
-### Built-in request interceptors
+### Using Built-in Request Interceptors
 ---
-The library comes with **2 request interceptors**:
+The library comes with only **2 request interceptors** by default:
 
 `Timing`
 
-Record total time elapsed (milliseconds) of the request. The time elapsed can be returned to the caller for logging purpose.
+Record total time elapsed (milliseconds) of a request. The time elapsed can be returned to the caller for logging purpose.
 
 Example:
 
@@ -115,7 +115,7 @@ console.log(`[getProduct] Get product took ${fetchProductTiming.elapsed()} milli
 
 `MockRequest`
 
-Simulate fetch request and return a mock response that you specify. It also supports response delay (delay for N number of milliseconds before returning the response) and response status code (e.g. HTTP 200, 400...etc.). `MockRequest` is very useful when you want to code without the dependency of a service API. When you're ready to intergrate with the actual service API, simply remove the MockRequest interceptor from the fetch request.
+Simulate fetch request and return a mock response that you specify. It also supports response delay (delay for N number of milliseconds before returning the response) and response status code (e.g. HTTP 200, 400...etc.). `MockRequest` is very useful when you want to code without the dependency of a service API. When you're ready to intergrate with the actual service API, simply remove the `MockRequest` interceptor from the fetch request.
 
 Example:
 
@@ -148,14 +148,14 @@ The `data` property of a `MockRequest` argument is the only mandatory property y
 }
 ```
 
-### Developing your own request interceptor
+### Developing Your Own Request Interceptor
 ---
 
-The main intention of the fetch-interceptor library is to allow you to develop your own request interceptor based on your requirement. The library provides the `BaseInterceptor` class for you to extend and develop your request interceptor.
+The main intention of this fetch-interceptor library is to allow you to develop your own request interceptor based on your requirement. The library provides a `BaseInterceptor` class for you to develop your request interceptor.
 
-Let's walk through the development of a simple request interceptor use case. Assuming you need to develop a mechanism to track / correlate all activities (events / actions) of a trasaction starting from frontend to backend and record these activities to application logs. Typically we call this concept as "[correlation](https://www.oreilly.com/library/view/building-microservices-with/9781785887833/1bebcf55-05bb-44a1-a4e5-f9733b8edfe3.xhtml)" which will make use of an unique transaction id typically call "Correlation id" assigning the unique id to each and every request starting from frontend to the backend (backend may consists of multiple services in a typical microservice architecture). - This is a good fit use case for request interceptor.
+Let's try to walkthrough a possible request interceptor use case - assuming you need to develop a mechanism to track / correlate all activities (events / actions) of a transaction starting from frontend to backend and record these activities to application logs. Typically we call this concept as "[correlation](https://www.oreilly.com/library/view/building-microservices-with/9781785887833/1bebcf55-05bb-44a1-a4e5-f9733b8edfe3.xhtml)" and we need an unique transaction id typically call "Correlation id" to circulate among the services, starting from frontend to the backend (backend may consists of multiple services).
 
->NOTE: The following example uses ES6 class syntax. You can use prototype inheritance style if you do not want to use ES6 class. Personally i recommended using ES6 class instead of prototype inheritance style.
+>NOTE: The following example uses ES6 class syntax. You can use prototype inheritance style if you do not want to use ES6 class. Personally i recommended using ES6 class instead of prototype inheritance style for class development.
 
 (1) Start by creating a class and extend from `BaseInterceptor`.
 
@@ -171,9 +171,9 @@ export default CorrelationId;
 ```
 
 (2) Next, create a constructor with 3 arguments; 
-1. `logger` argument variable to store the logger object to send activity to application logs.
-2. `activityName` argument variable to store the name of the activity (e.g. getUser). 
-3. `generateCorrelationId` argument variable to store a function to generate the unique id for our correlation context. You can use NPM package such as [uuidv4](https://www.npmjs.com/package/uuidv4) to generate such id for example.
+1. `logger` argument to store a logger object. The logger object will send activity to application logs.
+2. `activityName` argument to store the name of the activity (e.g. getUser). 
+3. `generateCorrelationId` argument to store a function to generate the unique id for our correlation context. You can use NPM package such as [uuidv4](https://www.npmjs.com/package/uuidv4) for this.
 
 ```
 class CorrelationId : extends BaseInterceptor
@@ -196,7 +196,7 @@ class CorrelationId : extends BaseInterceptor
 export default CorrelationId;
 ```
 
-(3) Next, override the `async invoke` function of the `BaseInterceptor` class. Within the function, you will invoke the `async fetch` function of the base class (`super.fetch`) and return its response. The `async invoke` function is invoked when the request interceptor is activated.
+(3) Next, override the `async invoke` function of the `BaseInterceptor` class. Inside the `async invoke` function, you need to invoke the `async fetch` function of the base class (`super.fetch`) and return its response. This `async invoke` function is invoked when the request interceptor gets to execute (activated) in an in-flight request.
 
 ```
 class CorrelationId :extends BaseInterceptor
@@ -221,7 +221,7 @@ class CorrelationId :extends BaseInterceptor
 export default CorrelationId;
 ```
 
-Code something like below to generate the unique id for the correlation context and inject it as a header to the request. For this to work, the backend must agree to recognize the header (by header name) as the correlation context and uses the unique id value from the header.
+The below sample logic generates an unique id for the correlation context and injects it as a header to the request. For this to work, the backend service must agree to recognize the header (by header name) as the correlation context and uses the value from the header as its correlation id.
 
 ```
 class CorrelationId :extends BaseInterceptor
@@ -268,7 +268,7 @@ class CorrelationId :extends BaseInterceptor
 export default CorrelationId;
 ```
 
-(4) Construct the request with the `CorrelationId` request interceptor.
+(4) Construct the fetch request with your `CorrelationId` request interceptor.
 
 **./src/Home.js**
 ```
@@ -290,6 +290,8 @@ const getUser = async (userId) => {
 };
 ```
 
+That's all you need to develop your very own request interceptor. You can then use it anytime you want in any fetch request moving forward.
+
 ## Additional notes
 ---
 
@@ -298,14 +300,18 @@ const getUser = async (userId) => {
 [Fluent API](https://en.wikipedia.org/wiki/Fluent_interface) design principle is a good fit for this library because it allows the code to clearly shows the chaining of multiple request interceptors. Such clarity helps developer to easily identify the execution sequence of the request interceptors.
 
 
-### 2. Non-intrusive Fetch API extension ###
+### 2. Non-intrusive Fetch API Extension ###
 
-This library does not wrap or modify the working mechanism of [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) but instead chosen an non-intrusive extension approach. A new `with ` property is attached to the `window.fetch` and all library code is encapsulated with the `with` property. Original Fetch API remains untouched.
+This library does not wrap or modify the working mechanism of [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) but instead chosen an non-intrusive extension approach. A new `with ` property is attached to the `window.fetch` and all library code is encapsulated inside the `with` function. Original Fetch API remains untouched.
 
 
 ### 3. 100% Compatibility with Fetch API ###
 
-If you are already using Fetch API, they will work 100% with or without request interceptors. You do not need to forcibly use request interceptor for all Fetch API requests. You are given the freedom to selectively apply request interceptor to selected Fetch API request. Due to this compatibility, you can slowly introduce request interceptor in your application without worrying of breaking changes.
+If you are already using Fetch API, they will work 100% with or without request interceptors. You do not need to forcibly use request interceptor for all your Fetch API requests. You are given the freedom to selectively apply request interceptor to selected Fetch API request. Due to this compatibility, you can slowly introduce request interceptor in your application without worrying of breaking changes.
+
+### 4. Class Design of `BaseInterceptor` Allows Constructor Dependency Injection
+
+You can design your request interceptor to use external dependency object (e.g. logger) and inject these objects to the request interceptor via the constructor.
 
 
 ## License
