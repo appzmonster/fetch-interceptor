@@ -17,19 +17,16 @@ fetch
 
 
 ### What is "Request interceptor"?
----
 Request interceptor is a function that is invoked during an in-flight (outgoig) request and is designed to intercept a request to perform additional processing before the request is sent and after the request returns. A request interceptor can add or modify a request header before the request is sent or transform a request response from xml to json. One or multiple request interceptors can also be chained together to work on a request. This is very useful in use case where you need to perform certain action and pass the result of the action to the next interceptor in a request.
 
 In short, a request interceptor enables the application to do additional action (intercept) before and after a request.
 
 
 ## Prerequisites
----
 The library extends [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) and expects the browser supports Fetch API. The library does not include polyfill to enable Fetch API. You are responsible to include any polyfill for browser that doesn't support Fetch API by default.
 
 
 ## Installation
----
 Fetch-interceptor is available as NPM package.
 
 ```
@@ -38,7 +35,6 @@ npm install @appzmonster/fetch-interceptor
 
 
 ## Usage
----
 You can start using fetch-interceptor by enabling it globally in your JavaScript application.
 
 ```
@@ -52,7 +48,6 @@ Typically, you'll code the above in `./index.js` or any JavaScript file that you
 
 
 ### Enable Request Interceptor in a Fetch Request
----
 In order to use request interceptor in a fetch request, you have to add the request interceptor to the fetch request via the `with` function: 
 
 Using async / await:
@@ -85,7 +80,6 @@ let response = await fetch
 > NOTE: Request interceptor must be an instance of `BaseInterceptor` class. We'll talk more about `BaseInterceptor` when we cover the topic of "**Developing your own request interceptor**" below.
 
 ### Using Built-in Request Interceptors
----
 The library comes with only **2 request interceptors** by default:
 
 `Timing`
@@ -149,8 +143,6 @@ The `data` property of a `MockRequest` argument is the only mandatory property y
 ```
 
 ### Developing Your Own Request Interceptor
----
-
 The main intention of this fetch-interceptor library is to allow you to develop your own request interceptor based on your requirement. The library provides a `BaseInterceptor` class for you to develop your request interceptor.
 
 Let's try to walkthrough a possible request interceptor use case - assuming you need to develop a mechanism to track / correlate all activities (events / actions) of a transaction starting from frontend to backend and record these activities to application logs. Typically we call this concept as "[correlation](https://www.oreilly.com/library/view/building-microservices-with/9781785887833/1bebcf55-05bb-44a1-a4e5-f9733b8edfe3.xhtml)" and we need an unique transaction id typically call "Correlation id" to circulate among the services, starting from frontend to the backend (backend may consists of multiple services).
@@ -293,27 +285,20 @@ const getUser = async (userId) => {
 That's all you need to develop your very own request interceptor. You can then use it anytime you want in any fetch request moving forward.
 
 ## Additional notes
----
-
 ### 1. Fluent API Design ###
-
 [Fluent API](https://en.wikipedia.org/wiki/Fluent_interface) design principle is a good fit for this library because it allows the code to clearly shows the chaining of multiple request interceptors. Such clarity helps developer to easily identify the execution sequence of the request interceptors.
 
 
 ### 2. Non-intrusive Fetch API Extension ###
-
 This library does not wrap or modify the working mechanism of [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) but instead chosen an non-intrusive extension approach. A new `with ` property is attached to the `window.fetch` and all library code is encapsulated inside the `with` function. Original Fetch API remains untouched.
 
 
 ### 3. 100% Compatibility with Fetch API ###
-
 If you are already using Fetch API, they will work 100% with or without request interceptors. You do not need to forcibly use request interceptor for all your Fetch API requests. You are given the freedom to selectively apply request interceptor to selected Fetch API request. Due to this compatibility, you can slowly introduce request interceptor in your application without worrying of breaking changes.
 
 ### 4. Class Design of `BaseInterceptor` Allows Constructor Dependency Injection
-
 You can design your request interceptor to use external dependency object (e.g. logger) and inject these objects to the request interceptor via the constructor.
 
 
 ## License
----
 Copyright (c) 2021 Jimmy Leong (Github: appzmonster). Licensed under the MIT License.
