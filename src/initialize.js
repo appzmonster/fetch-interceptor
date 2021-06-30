@@ -48,9 +48,9 @@ function initialize()
         */
         function FetchManager(interceptor)
         {
-            if ((interceptor instanceof BaseInterceptor) === false)
+            if (typeof (interceptor) !== 'object')
             {
-                throw new Error('Interceptor must extend from BaseInterceptor class');
+                throw new Error('Interceptor must be an instance of BaseInterceptor class');
             }
 
             this._interceptors = [].concat(interceptor);
@@ -95,9 +95,9 @@ function initialize()
 
             fetchRequest.with = (interceptor) => 
             {
-                if ((interceptor instanceof BaseInterceptor) === false)
+                if (typeof (interceptor) !== 'object')
                 {
-                    throw new Error('Interceptor must extend from BaseInterceptor class');
+                    throw new Error('Interceptor must be an instance of BaseInterceptor class');
                 }
 
                 this._interceptors.push(interceptor);

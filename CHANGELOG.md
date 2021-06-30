@@ -1,5 +1,9 @@
 # Change Log - @appzmonster/fetch-interceptor
 
+### 1.0.4 (Wednesday, 30 June 2021 15:57:00 GMT)
+
+- Fixed instanceof issue caused by babel transpilation.
+
 ### 1.0.3 (Wednesday, 30 June 2021 10:10:00 GMT)
 
 - Modified some context in README.md.
