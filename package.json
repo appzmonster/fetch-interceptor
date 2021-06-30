@@ -1,6 +1,6 @@
 {
   "name": "@appzmonster/fetch-interceptor",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Fetch-interceptor is a JavaScript library to enable request interceptor feature on Fetch API. The library extends Fetch API and uses fluent API design to allow chaining of one or multiple request interceptors to a Fetch API request.",
   "main": "./index.js",
   "scripts": {

@@ -285,15 +285,15 @@ const getUser = async (userId) => {
 That's all you need to develop your very own request interceptor. You can then use it anytime you want in any fetch request moving forward.
 
 ## Additional notes
-### 1. Fluent API Design ###
+### 1. Fluent API Design
 [Fluent API](https://en.wikipedia.org/wiki/Fluent_interface) design principle is a good fit for this library because it allows the code to clearly shows the chaining of multiple request interceptors. Such clarity helps developer to easily identify the execution sequence of the request interceptors.
 
 
-### 2. Non-intrusive Fetch API Extension ###
+### 2. Non-intrusive Fetch API Extension
 This library does not wrap or modify the working mechanism of [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) but instead chosen an non-intrusive extension approach. A new `with ` property is attached to the `window.fetch` and all library code is encapsulated inside the `with` function. Original Fetch API remains untouched.
 
 
-### 3. 100% Compatibility with Fetch API ###
+### 3. 100% Compatibility with Fetch API
 If you are already using Fetch API, they will work 100% with or without request interceptors. You do not need to forcibly use request interceptor for all your Fetch API requests. You are given the freedom to selectively apply request interceptor to selected Fetch API request. Due to this compatibility, you can slowly introduce request interceptor in your application without worrying of breaking changes.
 
 ### 4. Class Design of `BaseInterceptor` Allows Constructor Dependency Injection

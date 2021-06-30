@@ -27,7 +27,7 @@ function initialize()
         {
             if (typeof (window.fetch.with) !== 'function')
             {
-                console.error('Unable to add interceptor feature to fetch on \'with\' property because \'with\' property is already in used');
+                console.error('Unable to enable fetch-interceptor feature to fetch api because \'with\' property is already in use');
                 return;
             }
             return;
@@ -111,6 +111,10 @@ function initialize()
         {
             return new FetchManager(interceptor);
         };
+    }
+    else
+    {
+        console.error('Unable to enable fetch-interceptor feature because browser does not support fetch api');
     }
 }
 
