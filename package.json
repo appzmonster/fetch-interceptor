@@ -1,12 +1,12 @@
 {
   "name": "@appzmonster/fetch-interceptor",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Fetch-interceptor is a JavaScript library to enable request interceptor feature on Fetch API. The library extends Fetch API and uses fluent API design to allow chaining of one or multiple request interceptors to a Fetch API request.",
   "main": "./index.js",
   "scripts": {
     "prebuild": "rm -rf dist && mkdir dist && cp ./package.json dist && cp ./README.md dist && cp ./LICENSE dist && cp ./CHANGELOG.md dist",
     "build": "npm run prebuild && babel ./src -d dist --copy-files",
-    "publish:npm": "cd dist && npm publish --access public"
+    "publish:npm": "npm run build && cd dist && npm publish --access public"
   },
   "repository": {
     "type": "git",
