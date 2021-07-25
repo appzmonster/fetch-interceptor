@@ -11,7 +11,8 @@ class MockRequest extends BaseInterceptor
             delay: 1000, // Delay for 1 second by default.
             ok: true, // For Response.ok - true or false.
             status: 200,
-            statusText: 'OK'
+            statusText: 'OK',
+            simulateNetworkError: false // To simulate request fail to complete, thus throwing error.
         }, mock);
     }
 
@@ -39,14 +40,25 @@ class MockRequest extends BaseInterceptor
                 let mockResponse = new Response(mockBlob, 
                     { status : this._mock.status , statusText : this._mock.statusText });
 
-                if (this._mock.ok === true)
+                /*
+                    Reference: MDN
+                    The Promise returned from fetch() won’t reject on HTTP error status even 
+                    if the response is an HTTP 404 or 500. Instead, as soon as the server responds 
+                    with headers, the Promise will resolve normally (with the ok property of the 
+                    response set to false if the response isn’t in the range 200–299), and it will 
+                    only reject on network failure or if anything prevented the request from completing.
+                */
+                if (this._mock.simulateNetworkError === true)
                 {
-                    resolve(mockResponse);
+                    let networkError = new TypeError('Network request failed');
+                    reject(networkError);
                 }
                 else
                 {
-                    reject(mockResponse);
+                    // Resolve response even if it's an error because the request completed.
+                    resolve(mockResponse);
                 }
+                
             }, this._mock.delay);
         });
 

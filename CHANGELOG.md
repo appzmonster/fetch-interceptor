@@ -1,5 +1,11 @@
 # Change Log - @appzmonster/fetch-interceptor
 
+### 1.0.5 (Sunday, 25 July 2021 02:12:00 GMT)
+
+- Fixed error object thrown from MockRequest interceptor.
+- Added network error option to MockRequest interceptor to simulate network error.
+- Modified MockRequest interceptor error behaviour to follow Fetch API [spec](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch), resolve all request and only reject TypeError (when request fails to complete).
+
 ### 1.0.4 (Wednesday, 30 June 2021 15:57:00 GMT)
 
 - Fixed instanceof issue caused by babel transpilation.
