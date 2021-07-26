@@ -12,12 +12,18 @@ class MockRequest extends BaseInterceptor
             ok: true, // For Response.ok - true or false.
             status: 200,
             statusText: 'OK',
-            simulateNetworkError: false // To simulate request fail to complete, thus throwing error.
+            simulateNetworkError: false, // To simulate request fail to complete, thus throwing error.
+            disabled: false // Disable to enable this mock interceptor.
         }, mock);
     }
 
     async invoke(resource, init)
     {
+        if (this._mock.disabled === true)
+        {
+            return await super.fetch(resource, init);
+        }
+
         const promise = new Promise((resolve, reject) => 
         {
             setTimeout(() => 

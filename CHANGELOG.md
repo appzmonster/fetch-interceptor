@@ -1,5 +1,9 @@
 # Change Log - @appzmonster/fetch-interceptor
 
+### 1.0.6 (Monday, 26 July 2021 07:40:00 GMT)
+
+- Added feature to disable mock request. Disabled mock request will forward request and return response transparently.
+
 ### 1.0.5 (Sunday, 25 July 2021 02:12:00 GMT)
 
 - Fixed error object thrown from MockRequest interceptor.
